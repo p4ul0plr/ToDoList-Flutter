@@ -35,6 +35,7 @@ class _HomePageState extends State<HomePage> {
   var newTaskCtrl = TextEditingController();
 
   void add() {
+    if (newTaskCtrl.text.isEmpty) return;
     setState(() {
       widget.items.add(
         Item(
@@ -43,6 +44,12 @@ class _HomePageState extends State<HomePage> {
         ),
       );
       newTaskCtrl.text = "";
+    });
+  }
+
+  void remove(int index) {
+    setState(() {
+      widget.items.removeAt(index);
     });
   }
 
@@ -67,14 +74,51 @@ class _HomePageState extends State<HomePage> {
         itemCount: widget.items.length,
         itemBuilder: (BuildContext ctxt, int index) {
           final item = widget.items[index];
-          return CheckboxListTile(
-            title: Text(item.title),
+          return Dismissible(
+            child: CheckboxListTile(
+              title: Text(item.title),
+              value: item.done,
+              onChanged: (value) {
+                setState(() {
+                  item.done = value;
+                });
+              },
+            ),
             key: Key(item.title),
-            value: item.done,
-            onChanged: (value) {
-              setState(() {
-                item.done = value;
-              });
+            background: Container(
+              color: Colors.green.withOpacity(0.6),
+              child: Stack(
+                children: <Widget>[
+                  Positioned(
+                    left: 10,
+                    top: 15,
+                    child: Icon(
+                      Icons.check,
+                      size: 30,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            secondaryBackground: Container(
+              color: Colors.red.withOpacity(0.6),
+              child: Stack(
+                children: <Widget>[
+                  Positioned(
+                    right: 10,
+                    top: 15,
+                    child: Icon(
+                      Icons.delete_sweep,
+                      size: 30,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            onDismissed: (direction) {
+              remove(index);
             },
           );
         },
